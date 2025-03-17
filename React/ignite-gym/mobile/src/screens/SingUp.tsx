@@ -12,6 +12,8 @@ import { Button } from "@components/Button"
 import { useNavigation } from "@react-navigation/native"
 import { AppError } from "@utils/AppError"
 import { Toast } from "@gluestack-ui/themed";
+import { useState } from "react";
+import { useAuth } from "@hooks/useAuth";
 
 type FormDataProps = {
     name: string;
@@ -30,8 +32,10 @@ const singUpSchema = yup.object({
 });
 
 export function SingUp() {
+    const [isLoading, setIsLoading] = useState(false);
 
     const toast = useToast();
+    const { singIn } = useAuth();
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
         resolver: yupResolver(singUpSchema)
@@ -45,11 +49,14 @@ export function SingUp() {
 
     async function handleSingUp({ name, email, password }: FormDataProps) {
         try {
+            setIsLoading(true);
 
-            const response = await api.post('/users', { name, email, password });
-            console.log(response.data)
+            await api.post('/users', { name, email, password });
+            await singIn(email, password)
+
 
         } catch (error) {
+            setIsLoading(false);
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Não foi possível criar a conta. tente novamente mais tarde";
 
@@ -150,6 +157,7 @@ export function SingUp() {
                         <Button
                             title="Criar e acessar"
                             onPress={handleSubmit(handleSingUp)}
+                            isLoading={isLoading}
                         />
 
                     </Center>

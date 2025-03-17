@@ -1,6 +1,6 @@
 import { Heading, HStack, VStack, Text } from "@gluestack-ui/themed"
 import { useState } from "react"
-import { HomeHeader } from "@components/HomeHeaser"
+import { HomeHeader } from "@components/HomeHeader"
 import { Group } from "@components/Group"
 import { FlatList } from "react-native"
 import { ExerciseCard } from "@components/ExerciseCard"
@@ -8,9 +8,9 @@ import { Exercise } from "./Exercise"
 import { useNavigation } from "@react-navigation/native"
 import { AppNavigatorRoutesProps } from "../routes/app.routes"
 
-export function Home(){
+export function Home() {
     const [exercises, setExercises] = useState([
-        "Puxada Frontal", 
+        "Puxada Frontal",
         "Remada Curvada",
         "Remada UniLateral",
         "Levantamento Terra",
@@ -20,27 +20,27 @@ export function Home(){
 
     const navigation = useNavigation<AppNavigatorRoutesProps>()
 
-    function handleOpenExercisedetails(){
+    function handleOpenExercisedetails() {
         navigation.navigate("exercise")
     }
 
-    return(
+    return (
         <VStack flex={1}>
-            <HomeHeader/>
+            <HomeHeader />
 
-            <FlatList data={groups} 
-                keyExtractor={item => item} 
+            <FlatList data={groups}
+                keyExtractor={item => item}
                 renderItem={({ item }) => (
-                    <Group 
+                    <Group
                         name={item}
                         isActive={groupSelected.toLowerCase() === item.toLowerCase()}
                         onPress={() => setGroupSelected(item)}
                     />
-            )}
-            horizontal
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 32}}
-            style={{ marginVertical: 40, maxHeight: 44, minHeight: 44}}
+                )}
+                horizontal
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 32 }}
+                style={{ marginVertical: 40, maxHeight: 44, minHeight: 44 }}
             />
 
             <VStack px="$8" flex={1}>
@@ -54,14 +54,14 @@ export function Home(){
                     </Text>
                 </HStack>
 
-                <FlatList 
-                    data={exercises} 
-                    keyExtractor={(item) => item} 
-                    renderItem={() => <ExerciseCard onPress={handleOpenExercisedetails}/>} 
+                <FlatList
+                    data={exercises}
+                    keyExtractor={(item) => item}
+                    renderItem={() => <ExerciseCard onPress={handleOpenExercisedetails} />}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ paddingBottom: 20}}
+                    contentContainerStyle={{ paddingBottom: 20 }}
                 />
-                
+
             </VStack>
         </VStack>
     )

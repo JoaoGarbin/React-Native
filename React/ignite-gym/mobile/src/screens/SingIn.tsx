@@ -1,5 +1,6 @@
 import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from "@gluestack-ui/themed"
 import { Input } from "@components/input"
+import { useState } from "react"
 
 import BackgroundImg from "@assets/background.png"
 import Logo from "@assets/logo.svg"
@@ -17,6 +18,7 @@ type FormData = {
 }
 
 export function SingIn() {
+    const [isLoading, setIsLoading] = useState(false);
     const { singIn } = useAuth();
     const toast = useToast();
 
@@ -30,17 +32,22 @@ export function SingIn() {
 
     async function handleSingIn({ email, password }: FormData) {
         try {
+            setIsLoading(true);
             await singIn(email, password);
+
         } catch (error) {
             const isAppError = error instanceof AppError;
 
             const title = isAppError ? error.message : "Não foi possivel acessar. tente novamente mais tarde"
 
-            toast.show({
-                title,
-                placement: 'top',
-                bgColor: 'red.500'
-            })
+            setIsLoading(false);
+
+            /* toast.show({
+                 title,
+                 placement: 'top',
+                 bgColor: 'red.500'
+             });
+             */
         }
     }
     return (
@@ -99,7 +106,9 @@ export function SingIn() {
 
                         <Button
                             title="Acessar"
-                            onPress={handleSubmit(handleSingIn)} />
+                            onPress={handleSubmit(handleSingIn)}
+                            isLoading={isLoading}
+                        />
                     </Center>
 
                     <Center flex={1} justifyContent="flex-end" mt="$4">
