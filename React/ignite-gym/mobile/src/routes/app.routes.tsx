@@ -15,7 +15,7 @@ import { useTheme } from "@gluestack-style/react";
 
 type AppRoutes = {
     home: undefined;
-    exercise: undefined;
+    exercise: { exerciseId: string };
     profile: undefined;
     history: undefined;
 }

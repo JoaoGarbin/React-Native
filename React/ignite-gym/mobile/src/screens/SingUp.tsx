@@ -14,6 +14,7 @@ import { AppError } from "@utils/AppError"
 import { Toast } from "@gluestack-ui/themed";
 import { useState } from "react";
 import { useAuth } from "@hooks/useAuth";
+import { ToastMessage } from "@components/ToastMessage";
 
 type FormDataProps = {
     name: string;
@@ -60,10 +61,17 @@ export function SingUp() {
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Não foi possível criar a conta. tente novamente mais tarde";
 
+
             toast.show({
-                title,
                 placement: 'top',
-                bgColor: 'red.500',
+                render: ({ id }) => (
+                    <ToastMessage
+                        id={id}
+                        action="error"
+                        title={title}
+                        onClose={() => toast.close(id)}
+                    />
+                )
             });
 
         }

@@ -8,6 +8,7 @@ export type AuthContextDataProps = {
     user: UserDTO;
     singIn: (email: string, password: string) => Promise<void>;
     singOut: () => Promise<void>;
+    updateUserProfile: (userUpdate: UserDTO) => Promise<void>;
     isLoadingUserStorageData: boolean;
 }
 
@@ -20,7 +21,6 @@ export const AuthContext = createContext<AuthContextDataProps>({} as AuthContext
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
     const [user, setUser] = useState<UserDTO>({} as UserDTO);
-
     const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true);
 
     async function userAndTokenUpdate(userData: UserDTO, token: string) {
@@ -28,7 +28,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
         setUser(userData);
     }
-
     async function storageUserAndTokenSave(userData: UserDTO, token: string) {
         try {
             setIsLoadingUserStorageData(true);
@@ -65,7 +64,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
             setIsLoadingUserStorageData(false);
         }
     }
-
     async function singOut() {
         try {
             setIsLoadingUserStorageData(true);
@@ -78,6 +76,15 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
             throw error;
         } finally {
             setIsLoadingUserStorageData(false);
+        }
+    }
+
+    async function updateUserProfile(userUpdated: UserDTO) {
+        try {
+            setUser(userUpdated);
+            await storageUserSave(userUpdated);
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -106,7 +113,13 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
     return (
 
-        <AuthContext.Provider value={{ user, singIn, singOut, isLoadingUserStorageData }}>
+        <AuthContext.Provider value={{
+            user,
+            singIn,
+            singOut,
+            updateUserProfile,
+            isLoadingUserStorageData
+        }}>
             {children}
         </AuthContext.Provider>
 

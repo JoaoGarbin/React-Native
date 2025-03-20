@@ -11,6 +11,7 @@ import { Controller, useForm } from "react-hook-form"
 
 import { useAuth } from "@hooks/useAuth"
 import { AppError } from "@utils/AppError"
+import { ToastMessage } from "@components/ToastMessage"
 
 type FormData = {
     email: string;
@@ -42,12 +43,18 @@ export function SingIn() {
 
             setIsLoading(false);
 
-            /* toast.show({
-                 title,
-                 placement: 'top',
-                 bgColor: 'red.500'
-             });
-             */
+
+            toast.show({
+                placement: 'top',
+                render: ({ id }) => (
+                    <ToastMessage
+                        id={id}
+                        action="error"
+                        title={title}
+                        onClose={() => toast.close(id)}
+                    />
+                )
+            });
         }
     }
     return (

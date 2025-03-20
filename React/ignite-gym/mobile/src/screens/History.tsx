@@ -1,53 +1,83 @@
 
 import { HistoryCard } from "@components/HistoryCard"
 import { ScreenHeader } from "@components/ScreenHeader"
-import { Heading, VStack, Text} from "@gluestack-ui/themed"
-import { useState } from "react"
+import { ToastMessage } from "@components/ToastMessage"
+import { HistoryByDayDTO } from "@dtos/HistoryGroupByDayDTO"
+import { Heading, VStack, Text, useToast } from "@gluestack-ui/themed"
+import { useFocusEffect } from "@react-navigation/native"
+import { api } from "@services/api"
+import { AppError } from "@utils/AppError"
+import { useCallback, useState } from "react"
 import { SectionList } from "react-native"
 
-export function History(){
+export function History() {
 
-    const [exercises, setExercises] = useState([
-        {
-           title: "10.03.2025",
-           data: ["Puxada Frontal", "Remada Unilateral"],
-        },
-        {
-            title: "11.02.2025",
-            data: ["Puxada Frontal"],
-        },
-    ])
+    const [isLoading, setIsLoading] = useState(true);
+    const [exercises, setExercises] = useState<HistoryByDayDTO[]>([]);
+    const toast = useToast();
 
-    return(
+    async function fetchHistory() {
+
+        try {
+            setIsLoading(true);
+            const response = await api.get('/history');
+            setExercises(response.data);
+
+
+        } catch (error) {
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : 'Não foi possível carrregar o historico';
+
+            toast.show({
+                placement: 'top',
+                render: ({ id }) => (
+                    <ToastMessage
+                        id={id}
+                        action="error"
+                        title={title}
+                        onClose={() => toast.close(id)}
+                    />
+                )
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useFocusEffect(useCallback(() => {
+        fetchHistory();
+    }, []));
+
+    return (
         <VStack flex={1}>
-            <ScreenHeader title="Hístorico"/>
-            <SectionList 
-                sections={exercises}  
-                keyExtractor={item => item} 
-                renderItem={() => <HistoryCard/>}
+            <ScreenHeader title="Hístorico" />
+            <SectionList
+                sections={exercises}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => <HistoryCard data={item} />}
                 renderSectionHeader={({ section }) => (
-                    <Heading 
-                        color="$gray200" 
-                        fontSize="$md" 
-                        mt="$10" 
-                        mb="$3" 
-                        fontFamily="$hrading" 
-                        >
-                            {section.title}
-                        </Heading>
+                    <Heading
+                        color="$gray200"
+                        fontSize="$md"
+                        mt="$10"
+                        mb="$3"
+                        fontFamily="$hrading"
+                    >
+                        {section.title}
+                    </Heading>
                 )}
                 style={{ paddingHorizontal: 32 }}
                 contentContainerStyle={
-                    exercises.length === 0 && { flex:1, justifyContent: "center"}
+                    exercises.length === 0 && { flex: 1, justifyContent: "center" }
                 }
                 ListEmptyComponent={() => (
                     <Text color="$gray100" textAlign="center">
-                        Não há exercícios registrados ainda.{"\n"} 
+                        Não há exercícios registrados ainda.{"\n"}
                         Vamos fazer exercícios hoje?
                     </Text>
                 )}
                 showsVerticalScrollIndicator={false}
-                />
+            />
         </VStack>
     )
 }
