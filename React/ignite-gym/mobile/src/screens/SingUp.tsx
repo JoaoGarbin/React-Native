@@ -36,7 +36,7 @@ export function SingUp() {
     const [isLoading, setIsLoading] = useState(false);
 
     const toast = useToast();
-    const { singIn } = useAuth();
+    const { signIn } = useAuth();
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
         resolver: yupResolver(singUpSchema)
@@ -53,7 +53,7 @@ export function SingUp() {
             setIsLoading(true);
 
             await api.post('/users', { name, email, password });
-            await singIn(email, password)
+            await signIn(email, password)
 
 
         } catch (error) {
