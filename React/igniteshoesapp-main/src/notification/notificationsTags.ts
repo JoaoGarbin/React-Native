@@ -6,3 +6,7 @@ export function tagUserInfoCreate() {
         user_email: "rodrigo.goncalves@rocketseat.team",
     })
 }
+
+export function tagCartUpdate(itemCount: string) {
+    OneSignal.User.addTag("cart_item_count", itemCount)
+}
