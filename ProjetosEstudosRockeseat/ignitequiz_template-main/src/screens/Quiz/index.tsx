@@ -16,6 +16,8 @@ import { OutlineButton } from '../../components/OutlineButton';
 import Animated, { Easing, Extrapolate, Extrapolation, interpolate, runOnJS, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import { ProgressBar } from '../../components/ProgressBar';
 import { THEME } from '../../styles/theme';
+import { OverlayFeedback } from '../../components/OverlayFeedback';
+
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 interface Params {
@@ -33,6 +35,8 @@ export function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quiz, setQuiz] = useState<QuizProps>({} as QuizProps);
   const [alternativeSelected, setAlternativeSelected] = useState<null | number>(null);
+
+  const [statusReply, setStatusReply] = useState(0);
 
   const shake = useSharedValue(0);
   const scrollY = useSharedValue(0);
@@ -79,8 +83,11 @@ export function Quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
+      setStatusReply(1);
       setPoints(prevState => prevState + 1);
+      handleNextQuestion();
     } else {
+      setStatusReply(2);
       shakeAnimation();
     }
 
@@ -106,7 +113,12 @@ export function Quiz() {
   function shakeAnimation() {
     shake.value = withSequence(
       withTiming(3, { duration: 400, easing: Easing.bounce }),
-      withTiming(0)
+      withTiming(0, undefined, (finished) => {
+        'worket';
+        if (finished) {
+          runOnJS(handleNextQuestion)();
+        }
+      })
     )
   }
 
@@ -185,7 +197,7 @@ export function Quiz() {
 
   useEffect(() => {
     if (quiz.questions) {
-      handleNextQuestion();
+
     }
   }, [points]);
 
@@ -195,6 +207,8 @@ export function Quiz() {
 
   return (
     <View style={styles.container}>
+      <OverlayFeedback status={statusReply} />
+
       <Animated.View style={fixedProgressBarStyles}>
         <Text style={styles.title}>
           {quiz.title}
@@ -228,6 +242,7 @@ export function Quiz() {
               question={quiz.questions[currentQuestion]}
               alternativeSelected={alternativeSelected}
               setAlternativeSelected={setAlternativeSelected}
+              onUnmount={() => setStatusReply(0)}
             />
           </Animated.View>
         </GestureDetector>
