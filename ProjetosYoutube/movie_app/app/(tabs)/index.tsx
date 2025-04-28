@@ -6,17 +6,22 @@ import SearchBarComponents from "../../components/SearchBar";
 import useFetch from "@/services/useFetch";
 import { fetchMovies } from "@/services/api";
 import MovieCard from "@/components/MovieCard";
+import { useEffect, useState } from "react";
 
 export default function Index() {
   const router = useRouter();
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const {
     data: movie,
     loading: moviesLoading,
-    error: moviesError
+    error: moviesError,
   } = useFetch(() => fetchMovies({
     query: '',
   }))
+
+
 
   return (
     <View className="flex-1 bg-primary">
