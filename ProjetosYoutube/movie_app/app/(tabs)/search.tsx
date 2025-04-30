@@ -8,6 +8,7 @@ import { useRouter } from "expo-router";
 import { icons } from "@/constants/icons";
 import { SearchBar } from "react-native-screens";
 import SearchBarComponents from "@/components/SearchBar";
+import { updateSearchCount } from "@/services/appwhite";
 
 const Search = () => {
 
@@ -24,9 +25,14 @@ const Search = () => {
     }), false)
 
     useEffect(() => {
+
         const timeoutId = setTimeout(async () => {
             if (searchQuery.trim()) {
                 await loadMovies();
+
+                if (movie?.length > 0 && movie?.[0]) {
+                    await updateSearchCount(searchQuery, movie[0]);
+                }
             } else {
                 reset();
             }
