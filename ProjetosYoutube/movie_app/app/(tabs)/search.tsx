@@ -7,7 +7,7 @@ import { fetchMovies } from "@/services/api";
 import { useRouter } from "expo-router";
 import { icons } from "@/constants/icons";
 import { SearchBar } from "react-native-screens";
-import SearchBarComponents from "@/components/SearchBar";
+import SearchBarComponents from "@/components/SearchBarComponents";
 import { updateSearchCount } from "@/services/appwhite";
 
 const Search = () => {
@@ -29,10 +29,6 @@ const Search = () => {
         const timeoutId = setTimeout(async () => {
             if (searchQuery.trim()) {
                 await loadMovies();
-
-                if (movie?.length > 0 && movie?.[0]) {
-                    await updateSearchCount(searchQuery, movie[0]);
-                }
             } else {
                 reset();
             }
@@ -40,6 +36,14 @@ const Search = () => {
 
         return () => clearTimeout(timeoutId);
     }, [searchQuery])
+
+    useEffect(() => {
+        if (movie?.length > 0 && movie?.[0]) {
+            updateSearchCount(searchQuery, movie[0]);
+        }
+    }, [movie]);
+
+
 
     return (
         <View className="flex-1 bg-primary">
