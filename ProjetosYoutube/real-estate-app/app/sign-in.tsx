@@ -17,7 +17,7 @@ const signIn = () => {
         const result = await login();
 
         if (result) {
-            console.log('login Sucess');
+            refetch();
 
         } else {
             Alert.alert('Error', 'Failed to login');
