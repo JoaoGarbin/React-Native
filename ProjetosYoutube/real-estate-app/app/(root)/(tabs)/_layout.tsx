@@ -60,4 +60,4 @@ const TabsLayout = () => {
     )
 }
 
-export default Tabs
+export default TabsLayout
