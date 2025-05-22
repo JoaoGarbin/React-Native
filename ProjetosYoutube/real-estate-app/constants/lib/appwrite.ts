@@ -128,7 +128,7 @@ export async function getProperties({ filter, query, limit }: {
             config.propertiesCollectionId!,
             buildQuery,
         )
-
+        return result.documents;
     } catch (error) {
         console.log(error);
         return [];
