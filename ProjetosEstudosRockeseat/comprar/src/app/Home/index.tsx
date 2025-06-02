@@ -1,14 +1,14 @@
-import { Alert, FlatList, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { useState, useEffect } from 'react';
 
 import { styles } from './styles';
 import { FilterStatus } from '@/types/FilterStatus';
+import { itemsStorage, ItemStorage } from '@/storage/itemsStorage';
 
 import { Item } from '@/components/Item';
 import { Input } from '@/components/input';
 import { Filter } from '@/components/Filter';
 import { Button } from '@/components/Button';
-import { useState } from 'react';
-import { FilterIcon } from 'lucide-react-native';
 
 const FILTER_STATUS: FilterStatus[] = [FilterStatus.PENDING, FilterStatus.DONE]
 
@@ -16,9 +16,9 @@ export function Home() {
 
   const [filter, setFilter] = useState(FilterStatus.PENDING);
   const [description, setDescription] = useState("")
-  const [items, setItems] = useState<any>([])
+  const [items, setItems] = useState<ItemStorage[]>([])
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!description.trim()) {
       return Alert.alert("Adicionar", "Informe a descrição para Adicionar")
     }
@@ -29,15 +29,77 @@ export function Home() {
       status: FilterStatus.PENDING,
     }
 
-    setItems(prevState => [...prevState, newItem])
+    await itemsStorage.add(newItem)
+    await itemsByStatus()
+    setFilter(FilterStatus.PENDING)
+    Alert.alert("Adicionado", `Adicionado ${description}`)
+    setDescription("")
   }
+
+  async function itemsByStatus() {
+    try {
+      const response = await itemsStorage.getByStatus(filter)
+      setItems(response)
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Error", "Não foi possível filtrar os itens.")
+    }
+  }
+
+  async function handleRemove(id: string) {
+    try {
+
+      await itemsStorage.remove(id)
+      await itemsByStatus()
+
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Remover", "Não foi possível remover.")
+    }
+  }
+
+  function handleClear() {
+    Alert.alert("Limpar", "Desejar remover Todos?", [
+      { text: "Não", style: "cancel" },
+      { text: "Sim", onPress: () => onClear() }
+    ])
+  }
+
+  async function onClear() {
+    try {
+      await itemsStorage.clear()
+      setItems([])
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Erro", "Não foi possível remover todos os itens")
+    }
+  }
+
+  async function handleToggleItemStatus(id: string) {
+    try {
+      await itemsStorage.toggleStatus(id)
+      await itemsByStatus()
+    } catch (error) {
+      console.log(error)
+      Alert.alert("Error", "Não foi possível atualizar o status")
+    }
+  }
+
+  useEffect(() => {
+    itemsByStatus()
+  }, [filter])
 
   return (
     <View style={styles.container}>
       <Image source={require("@/assets/logo.png")} style={styles.logo} />
 
       <View style={styles.form}>
-        <Input placeholder="O que você precisa comprar?" onChangeText={setDescription} />
+        <Input
+          placeholder="O que você precisa comprar?"
+          onChangeText={setDescription}
+          value={description}
+        />
+
         <Button title="Adicionar" onPress={handleAdd} />
       </View>
 
@@ -53,7 +115,7 @@ export function Home() {
               />
             ))
           }
-          <TouchableOpacity style={styles.clearButton}>
+          <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
             <Text style={styles.clearText}>Limpar</Text>
           </TouchableOpacity>
         </View>
@@ -64,8 +126,8 @@ export function Home() {
           renderItem={({ item }) =>
             <Item
               data={item}
-              onStatus={() => console.log("mudar o status")}
-              onRemove={() => console.log("remove o item")}
+              onStatus={() => handleToggleItemStatus(item.id)}
+              onRemove={() => handleRemove(item.id)}
             />}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
