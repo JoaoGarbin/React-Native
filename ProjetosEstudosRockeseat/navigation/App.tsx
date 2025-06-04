@@ -1,4 +1,4 @@
-import { Product } from '@/app/Product';
+import { Routes } from '@/routes';
 import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
@@ -9,7 +9,7 @@ export default function App() {
         backgroundColor="transparent"
         style='dark'
       />
-      <Product />
+      <Routes />
     </>
   );
 }
