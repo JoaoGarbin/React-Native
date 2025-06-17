@@ -1,11 +1,16 @@
-import { Text, View } from "react-native";
+import { User } from "@/components/User";
+import { Image, Text, View } from "react-native";
 
 export function Profile() {
     return (
         <View
-            className="flex-1 bg-gray-700"
+            className="flex-1 bg-gray-900"
         >
-            <Text>Profile</Text>
+            <Image
+                source={require("@/assets/banner.png")}
+                className="w-full h-52 -mb-16"
+            />
+            <User />
         </View>
     )
 }
