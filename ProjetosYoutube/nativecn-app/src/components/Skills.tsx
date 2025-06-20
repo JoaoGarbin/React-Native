@@ -8,14 +8,13 @@ export function Skills() {
         <View className="w-full">
             <Title>Skills</Title>
 
-            <View className="flex-row">
-                {
-                    SKILLS.map((skill) => (
-                        <Badge key={skill.name} variant={"secondary"} icon={skill.icon}>
-                            <Text className="text-white">{skill.name}</Text>
-                        </Badge>
-                    ))}
+            <View className="flex-row flex-wrap gap-2 mt-2">
+                {SKILLS.map((skill) => (
+                    <Badge key={skill.name} variant="secondary" icon={skill.icon}>
+                        <Text className="text-white">{skill.name}</Text>
+                    </Badge>
+                ))}
             </View>
         </View>
-    )
+    );
 }
